@@ -2,7 +2,6 @@
 
 namespace Balthild\PhpCsFixerLsp\Tests;
 
-use Amp\Loop;
 use Amp\Promise;
 use Balthild\PhpCsFixerLsp\Model\ExceptionInfo;
 use Balthild\PhpCsFixerLsp\Model\IPC\FormatRequest;
