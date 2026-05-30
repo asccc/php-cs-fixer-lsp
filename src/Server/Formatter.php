@@ -16,6 +16,13 @@ use Psr\Log\LoggerInterface;
 
 class Formatter implements FormatterInterface
 {
+    /**
+     * File extensions to skip formatting for, e.g. ['phtml', 'twig'].
+     * Can be overridden via the PHP_CS_FIXER_LSP_EXCLUDE_EXTENSIONS env var
+     * (comma-separated), or by extending this class.
+     */
+    protected array $excludedExtensions = ['phtml'];
+
     public function __construct(
         protected LoggerInterface $logger,
         protected WorkerPool $workers,
@@ -35,6 +42,16 @@ class Formatter implements FormatterInterface
                 );
                 return new Success(null);
             }
+        }
+
+        // Skip excluded file extensions
+        $path = \parse_url($textDocument->uri, PHP_URL_PATH) ?? '';
+        $ext = \strtolower(\pathinfo($path, PATHINFO_EXTENSION));
+        if (\in_array($ext, $this->excludedExtensions, true)) {
+            $this->logger->info(
+                "skipping {$textDocument->uri} because extension '.{$ext}' is excluded",
+            );
+            return new Success(null);
         }
 
         $this->logger->info("formatting {$textDocument->uri}");
